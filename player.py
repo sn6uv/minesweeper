@@ -26,12 +26,15 @@ def print_stats(game):
 class Player:
   '''Plays minesweeper'''
 
-  def __init__(self, height, width, mines):
+  def __init__(self, height, width, mines, model=None):
     self.height = height
     self.width = width
     self.mines = mines
     self.data = []
-    self.model = Model(height, width)
+    if model is None:
+      self.model = Model(height, width)
+    else:
+      self.model = model
 
   def play(self, rounds):
     won = 0
@@ -52,8 +55,6 @@ class Player:
         break
       self.data.append((game_input, get_output(game)))
       if game.is_won():
-        print("WON")
-        print(game)
         return True
     return False
 
