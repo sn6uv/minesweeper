@@ -40,13 +40,6 @@ class Game:
     self.spread(pos)
     return False
 
-  def get_hints(self):
-    result = [[0 for _ in range(self.width)] for _ in range(self.width)]
-    for pos in self.mines:
-     for (ii, jj) in self.neighbors(pos):
-       result[ii][jj] += 1
-    return result
-
   def neighbors(self, pos):
     i, j = pos
     for ii in range(max(i-1, 0), min(i+2, self.height)):
