@@ -34,10 +34,11 @@ class Player:
     self.model = Model(height, width)
 
   def play(self, rounds):
+    won = 0
     for _ in range(rounds):
       g = Game(self.height, self.width, self.mines)
-      self.play_game(g)
-      # print_stats(game)
+      won += self.play_game(g)
+    print("Win rate: %f%%" % (100.0 * won / float(rounds)))
 
   def play_game(self, game):
     hit = False
@@ -50,6 +51,11 @@ class Player:
         print("Invalid choice")
         break
       self.data.append((game_input, get_output(game)))
+      if game.is_won():
+        print("WON")
+        print(game)
+        return True
+    return False
 
   def predict_mines(self, game_input):
     # pred = np.random.random(self.height * self.width)

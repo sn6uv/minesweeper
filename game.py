@@ -64,6 +64,9 @@ class Game:
     for n in self.neighbors(pos):
       self.spread(n)
 
+  def is_won(self):
+    return len(self.guessed) + len(self.mines) == self.height * self.width
+
 
 def BeginnerGame():
   return Game(9, 9, 10)
