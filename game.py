@@ -34,6 +34,11 @@ class Game:
 
   # Returns True if a mine was hit.
   def guess(self, pos):
+    if not self.guessed and pos in self.mines:
+      # If the first guess was unlucky then move the mine.
+      while pos in self.mines:
+        self.mines.remove(pos)
+        self.add_mines(1)
     if pos in self.mines:
       return True
     if pos in self.guessed:
@@ -66,15 +71,3 @@ class Game:
 
   def is_won(self):
     return len(self.guessed) + len(self.mines) == self.height * self.width
-
-
-def BeginnerGame():
-  return Game(9, 9, 10)
-
-
-def IntermediateGame():
-  return Game(16, 16, 40)
-
-
-def AdvancedGame():
-  return Game(24, 24, 99)

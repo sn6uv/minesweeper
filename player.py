@@ -50,9 +50,7 @@ class Player:
       pred = self.predict_mines(game_input)
       pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
       hit = game.guess(pos)
-      if hit is None:
-        print("Invalid choice")
-        break
+      assert(hit is not None)
       self.data.append((game_input, get_output(game)))
       if game.is_won():
         return True
