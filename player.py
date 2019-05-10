@@ -1,22 +1,27 @@
 import numpy as np
+import tensorflow as tf
 from game import Game
+from model import Model
 
 def get_input(game):
-  o = np.zeros((game.height, game.width))
+  o = np.zeros((game.height, game.width, 10))
   for i in range(game.height):
     for j in range(game.width):
       pos = (i, j)
       if pos not in game.guessed:
-        o[pos] = 10
+        o[i, j, 9] = 1
         continue
-      o[pos] = game.count_nearby_mines(pos)
-  return o
+      o[i, j, game.count_nearby_mines(pos)] = 1
+  return o.flatten()
 
 def get_output(game):
   o = np.zeros((game.height, game.width))
   for m in game.mines:
     o[m] = 1
-  return o
+  return o.flatten()
+
+def print_stats(game):
+  print("guessed", len(game.guessed), "squares")
 
 class Player:
   '''Plays minesweeper'''
@@ -26,26 +31,32 @@ class Player:
     self.width = width
     self.mines = mines
     self.data = []
+    self.model = Model(height, width)
 
   def play(self, rounds):
     for _ in range(rounds):
       g = Game(self.height, self.width, self.mines)
       self.play_game(g)
+      # print_stats(game)
 
   def play_game(self, game):
     hit = False
     while not hit:
       game_input = get_input(game)
       pred = self.predict_mines(game_input)
-      pos = np.unravel_index(np.argmin(pred), pred.shape)
+      pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
       hit = game.guess(pos)
       if hit is None:
         print("Invalid choice")
         break
-      self.data.append((game_input, pred, get_output(game)))
+      self.data.append((game_input, get_output(game)))
 
   def predict_mines(self, game_input):
-    pred = np.random.random((self.height, self.width))
+    # pred = np.random.random(self.height * self.width)
+    pred = self.model.predict(game_input)[0]
     # Set already guessed positions to 1 to avoid choosing them
-    pred[game_input < 10] = 1
+    pred[game_input.reshape(self.height, self.width, 10)[:,:,9].flatten() != 1] = 1
     return pred
+
+  def train(self):
+    self.model.train(self.data)
