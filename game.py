@@ -36,7 +36,8 @@ class Game:
   def guess(self, pos):
     if pos in self.mines:
       return True
-    assert(pos not in self.guessed)
+    if pos in self.guessed:
+      return None
     self.spread(pos)
     return False
 
