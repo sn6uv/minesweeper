@@ -43,7 +43,7 @@ class Model:
     self.loss = loss_p + beta * regulariser
     self.train_step = tf.train.AdamOptimizer(0.001).minimize(self.loss)
 
-  def train(self, examples, batch_size=1000, factor=1):
+  def train(self, examples, batch_size=5000, factor=1):
       """Trains the model on examples.
 
       Args:

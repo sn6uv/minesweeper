@@ -48,10 +48,10 @@ class Player:
       game_input = get_input(game)
       pred = self.predict_mines(game_input)
       pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
+      hit = game.guess(pos)
       if debug:
         print('-' * game.width)
         print(format_move(game, pos))
-      hit = game.guess(pos)
       assert(hit is not None)
       self.data.append((game_input, get_output(game)))
       if game.is_won():
@@ -69,5 +69,5 @@ class Player:
     pred[game_input.reshape(self.height, self.width, 10)[:,:,9].flatten() != 1] = 1
     return pred
 
-  def train(self):
-    self.model.train(self.data)
+  def train(self, *args, **kwargs):
+    self.model.train(self.data, *args, **kwargs)
