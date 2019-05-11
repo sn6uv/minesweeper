@@ -1,5 +1,23 @@
 import random
 
+def format_move(game, pos):
+  lines = []
+  for i in range(game.height):
+    line = []
+    for j in range(game.width):
+      if (i, j) == pos:
+        if pos in game.mines:
+          line.append('x')
+        else:
+          line.append('o')
+      elif (i,j) in game.guessed:
+        line.append(str(game.count_nearby_mines((i,j))))
+      else:
+        line.append(' ')
+    lines.append(line)
+  return '\n'.join(''.join(line) for line in lines)
+
+
 class Game:
   def __init__(self, height, width, mines):
     self.height = height
@@ -21,16 +39,7 @@ class Game:
         break
 
   def __repr__(self):
-    lines = []
-    for i in range(self.height):
-      line = []
-      for j in range(self.width):
-        if (i,j) in self.guessed:
-          line.append(str(self.count_nearby_mines((i,j))))
-        else:
-          line.append(' ')
-      lines.append(line)
-    return '\n'.join(''.join(line) for line in lines)
+    return format_move(self, None)
 
   # Returns True if a mine was hit.
   def guess(self, pos):

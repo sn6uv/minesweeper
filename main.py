@@ -1,7 +1,8 @@
 from player import Player
 from player import Player
 
-p = Player(4, 4, 2)
-for _ in range(100):
+p = Player(6, 15, 10)
+for _ in range(1000):
   p.play(1000)
   p.train()
+  p.play(1, debug=True)

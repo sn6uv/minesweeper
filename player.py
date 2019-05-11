@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from game import Game
+from game import Game, format_move
 from model import Model
 
 def get_input(game):
@@ -20,8 +20,6 @@ def get_output(game):
     o[m] = 1
   return o.flatten()
 
-def print_stats(game):
-  print("guessed", len(game.guessed), "squares")
 
 class Player:
   '''Plays minesweeper'''
@@ -36,24 +34,32 @@ class Player:
     else:
       self.model = model
 
-  def play(self, rounds):
+  def play(self, rounds, debug=False):
     won = 0
     for _ in range(rounds):
       g = Game(self.height, self.width, self.mines)
-      won += self.play_game(g)
-    print("Win rate: %f%%" % (100.0 * won / float(rounds)))
+      won += self.play_game(g, debug)
+    if rounds > 1:
+      print("Win rate: %f%%" % (100.0 * won / float(rounds)))
 
-  def play_game(self, game):
+  def play_game(self, game, debug=False):
     hit = False
     while not hit:
       game_input = get_input(game)
       pred = self.predict_mines(game_input)
       pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
+      if debug:
+        print('-' * game.width)
+        print(format_move(game, pos))
       hit = game.guess(pos)
       assert(hit is not None)
       self.data.append((game_input, get_output(game)))
       if game.is_won():
+        if debug:
+          print("Won!")
         return True
+    if debug:
+      print("Lost!")
     return False
 
   def predict_mines(self, game_input):
