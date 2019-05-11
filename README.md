@@ -21,7 +21,7 @@ be safe by moving a mine if the first guess is unlucky.
 
 ## Results
 
-### 4x2 with 2 mines
+### 4x4 with 2 mines
 
 Wins >95% of games (<1 min of training).
 
@@ -31,4 +31,4 @@ Wins >60% of games (2 mins of training).
 
 ### 9x9 with 10 mines (Beginner)
 
-TODO
+Wins 0.5% of games (after 10mins training).
