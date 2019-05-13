@@ -6,25 +6,6 @@ from game import Game, format_move
 from model import Model
 
 
-def get_model_input(game):
-  o = np.zeros((game.height, game.width, 10))
-  for i in range(game.height):
-    for j in range(game.width):
-      pos = (i, j)
-      if pos not in game.guessed:
-        o[i, j, 9] = 1
-        continue
-      o[i, j, game.count_nearby_mines(pos)] = 1
-  return o.flatten()
-
-
-def get_model_output(game):
-  o = np.zeros((game.height, game.width))
-  for m in game.mines:
-    o[m] = 1
-  return o.flatten()
-
-
 class Player:
   '''Plays minesweeper'''
 
@@ -49,7 +30,7 @@ class Player:
   def play_game(self, game, debug=False):
     hit = False
     while not hit:
-      game_input = get_model_input(game)
+      game_input = self.get_model_input(game.view())
       pred = self.predict_mines(game_input)
       pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
       hit = game.guess(pos)
@@ -57,7 +38,7 @@ class Player:
         print('-' * game.width)
         print(format_move(game, pos))
       assert(hit is not None)
-      self.data.append((game_input, get_model_output(game)))
+      self.data.append((game.view(), game.mines))
       if game.is_won():
         if debug:
           print("Won!")
@@ -74,7 +55,8 @@ class Player:
     return pred
 
   def train(self, *args, **kwargs):
-    self.model.train(self.data, *args, **kwargs)
+    i = [(self.get_model_input(row[0]), self.get_model_output(row[1])) for row in self.data]
+    self.model.train(i, *args, **kwargs)
 
   def dump_data(self, f):
     pickle.dump(self.data, f)
@@ -82,3 +64,20 @@ class Player:
 
   def load_data(self, f):
     self.data.extend(pickle.load(f))
+
+  def get_model_input(self, view):
+    o = np.zeros((self.height, self.width, 10))
+    for i in range(self.height):
+      for j in range(self.width):
+        pos = (i, j)
+        if view[i][j] is None:
+          o[i, j, 9] = 1
+        else:
+          o[i, j, view[i][j]] = 1
+    return o.flatten()
+
+  def get_model_output(self, mines):
+    o = np.zeros((self.height, self.width))
+    for m in mines:
+      o[m] = 1
+    return o.flatten()
