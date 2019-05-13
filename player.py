@@ -37,6 +37,7 @@ class Player:
       if debug:
         print('-' * game.width)
         print(format_move(game, pos))
+        print("p_min =", np.min(pred))
       assert(hit is not None)
       self.data.append((game.view(), game.mines))
       if game.is_won():
