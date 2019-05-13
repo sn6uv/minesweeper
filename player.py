@@ -1,9 +1,12 @@
+import pickle
+
 import numpy as np
 import tensorflow as tf
 from game import Game, format_move
 from model import Model
 
-def get_input(game):
+
+def get_model_input(game):
   o = np.zeros((game.height, game.width, 10))
   for i in range(game.height):
     for j in range(game.width):
@@ -14,7 +17,8 @@ def get_input(game):
       o[i, j, game.count_nearby_mines(pos)] = 1
   return o.flatten()
 
-def get_output(game):
+
+def get_model_output(game):
   o = np.zeros((game.height, game.width))
   for m in game.mines:
     o[m] = 1
@@ -45,7 +49,7 @@ class Player:
   def play_game(self, game, debug=False):
     hit = False
     while not hit:
-      game_input = get_input(game)
+      game_input = get_model_input(game)
       pred = self.predict_mines(game_input)
       pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
       hit = game.guess(pos)
@@ -53,7 +57,7 @@ class Player:
         print('-' * game.width)
         print(format_move(game, pos))
       assert(hit is not None)
-      self.data.append((game_input, get_output(game)))
+      self.data.append((game_input, get_model_output(game)))
       if game.is_won():
         if debug:
           print("Won!")
@@ -71,3 +75,10 @@ class Player:
 
   def train(self, *args, **kwargs):
     self.model.train(self.data, *args, **kwargs)
+
+  def dump_data(self, f):
+    pickle.dump(self.data, f)
+    self.data = []
+
+  def load_data(self, f):
+    self.data.extend(pickle.load(f))

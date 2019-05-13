@@ -1,7 +1,7 @@
 import numpy as np
 import random
 
-from player import Player, get_input, get_output
+from player import Player, get_model_input, get_model_output
 from game import Game
 
 
@@ -12,7 +12,7 @@ def test_player():
   assert(p.data)
 
 
-def test_get_input():
+def test_get_model_input():
   random.seed(a=0)
   g = Game(2, 2, 1)
   g.guess((1,1))
@@ -21,16 +21,16 @@ def test_get_input():
   output[19] = 1.0
   output[29] = 1.0
   output[31] = 1.0
-  assert(np.array_equal(get_input(g), output))
+  assert(np.array_equal(get_model_input(g), output))
 
 
-def test_get_output():
+def test_get_model_output():
   random.seed(a=0)
   g = Game(2, 2, 1)
-  assert(np.all(get_output(g) == np.array([0, 0, 0, 1])))
+  assert(np.all(get_model_output(g) == np.array([0, 0, 0, 1])))
 
 
 if __name__ == '__main__':
   test_player()
-  test_get_input()
-  test_get_output()
+  test_get_model_input()
+  test_get_model_output()

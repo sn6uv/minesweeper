@@ -1,11 +1,10 @@
 import glob
 import datetime
 import os
-import pickle
 from player import Player
 
 def get_subdir(p):
-  return os.path.join('data', str(p.height) + 'x' + str(p.width))
+  return os.path.join('data', str(p.height) + '_' + str(p.width) + '_' + str(p.mines))
 
 def dump_data(p):
   fname = str(datetime.datetime.now()) + ".pickle"
@@ -13,8 +12,7 @@ def dump_data(p):
   if not os.path.exists(subdir):
     os.mkdir(subdir)
   with open(os.path.join(subdir, fname), 'wb') as f:
-    pickle.dump(p.data, f)
-  p.data = []
+    p.dump_data(f)
 
 
 def load_data(p):
@@ -23,10 +21,10 @@ def load_data(p):
   for fname in glob.glob(os.path.join(subdir, "*.pickle")):
     print("loading ", fname)
     with open(fname, "rb") as f:
-      p.data.extend(pickle.load(f))
+      p.load_data(f)
 
 
-p = Player(5, 5, 3)
+p = Player(3, 3, 2)
 
 print("Training...")
 load_data(p)
