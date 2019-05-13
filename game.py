@@ -1,21 +1,13 @@
 import random
 
+
 def format_move(game, pos):
-  lines = []
-  for i in range(game.height):
-    line = []
-    for j in range(game.width):
-      if (i, j) == pos:
-        if pos in game.mines:
-          line.append('x')
-        else:
-          line.append('o')
-      elif (i,j) in game.guessed:
-        line.append(str(game.count_nearby_mines((i,j))))
-      else:
-        line.append(' ')
-    lines.append(line)
-  return '\n'.join(''.join(line) for line in lines)
+  view = game.view()
+  result = [[str(v) if v is not None else ' ' for v in row] for row in view]
+  if pos is not None:
+    i, j = pos
+    result[i][j] = 'x' if pos in game.mines else 'o'
+  return '\n'.join(''.join(row) for row in result)
 
 
 class Game:
@@ -80,3 +72,16 @@ class Game:
 
   def is_won(self):
     return len(self.guessed) + len(self.mines) == self.height * self.width
+
+  def view(self):
+    '''machine readable representation of what's seen'''
+    rows = []
+    for i in range(self.height):
+      row = []
+      for j in range(self.width):
+        if (i,j) in self.guessed:
+          row.append(self.count_nearby_mines((i,j)))
+        else:
+          row.append(None)
+      rows.append(row)
+    return rows
