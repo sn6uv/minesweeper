@@ -1,9 +1,24 @@
 import random
 
+basic_style = {
+  0: '0',
+  1: '1',
+  2: '2',
+  3: '3',
+  4: '4',
+  5: '5',
+  6: '6',
+  7: '7',
+  8: '8',
+  None: ' ',
+}
 
-def format_move(game, pos):
+
+def format_move(game, pos, style=None):
+  if style is None:
+    style = basic_style
   view = game.view()
-  result = [[str(v) if v is not None else ' ' for v in row] for row in view]
+  result = [[style[v] for v in row] for row in view]
   if pos is not None:
     i, j = pos
     result[i][j] = 'x' if pos in game.mines else 'o'

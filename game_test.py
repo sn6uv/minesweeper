@@ -1,6 +1,6 @@
 import random
 
-from game import Game
+from game import Game, format_move
 
 
 def test_simple_game():
@@ -54,6 +54,21 @@ def test_is_won():
   assert(not g.guess((0, 0)))
   assert(g.is_won())
 
+def test_view():
+  random.seed(a=1)
+  g = Game(2, 2, 1)
+  g.guess((0, 0))
+  assert(g.view() == [[1, None], [None, None]])
+
+def test_format_move():
+  random.seed(a=1)
+  g = Game(2, 2, 1)
+  g.guess((0, 0))
+  assert(format_move(g, (0,0)) == 'o \n  ')
+  g.guess((1, 1))
+  assert(format_move(g, (1,1)) == '1 \n o')
+  g.guess((1, 0))
+  assert(format_move(g, (1, 0)) == '1 \nx1')
 
 if __name__ == '__main__':
   test_simple_game()
@@ -62,3 +77,5 @@ if __name__ == '__main__':
   test_full_mines()
   test_game_repr()
   test_is_won()
+  test_view()
+  test_format_move()
