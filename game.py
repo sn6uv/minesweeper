@@ -1,5 +1,6 @@
 import random
 
+
 basic_style = {
   0: '0',
   1: '1',
@@ -11,17 +12,41 @@ basic_style = {
   7: '7',
   8: '8',
   None: ' ',
+  'o': 'o',
+  'x': 'x',
 }
+
+default_style=basic_style
+
+try:
+  from sty import fg, bg
+  sty_style = {
+    0: bg.white + ' ' + bg.rs,
+    1: bg.white + fg.blue + '1' + fg.rs + bg.rs,
+    2: bg.white + fg.green + '2' + fg.rs + bg.rs,
+    3: bg.white + fg.red + '3' + fg.rs + bg.rs,
+    4: bg.white + fg.da_blue + '4' + fg.rs+ bg.rs,
+    5: bg.white + fg.da_red + '5'+ fg.rs + bg.rs,
+    6: bg.white + fg.da_green + '6'+ fg.rs + bg.rs,
+    7: bg.white + fg.magenta + '7'+ fg.rs + bg.rs,
+    8: bg.white + fg.black + '8'+ fg.rs + bg.rs,
+    None: bg.da_white + ' ' + bg.rs,
+    'o': bg.green + 'o' + bg.rs,
+    'x': bg.red + 'x' + bg.rs,
+  }
+  default_style = sty_style
+except ImportError:
+  pass
 
 
 def format_move(game, pos, style=None):
   if style is None:
-    style = basic_style
+    style = default_style
   view = game.view()
   result = [[style[v] for v in row] for row in view]
   if pos is not None:
     i, j = pos
-    result[i][j] = 'x' if pos in game.mines else 'o'
+    result[i][j] = style['x'] if pos in game.mines else style['o']
   return '\n'.join(''.join(row) for row in result)
 
 

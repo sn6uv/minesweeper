@@ -24,7 +24,7 @@ def load_data(p):
       p.load_data(f)
 
 
-p = Player(5, 5, 4)
+p = Player(9, 9, 10)
 
 print("Training...")
 load_data(p)
