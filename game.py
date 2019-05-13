@@ -14,7 +14,7 @@ basic_style = {
   None: ' ',
   'o': 'o',
   'x': 'x',
-}
+}, lambda x, s:  s
 
 default_style=basic_style
 
@@ -30,23 +30,29 @@ try:
     6: bg.white + fg.da_green + '6'+ fg.rs + bg.rs,
     7: bg.white + fg.magenta + '7'+ fg.rs + bg.rs,
     8: bg.white + fg.black + '8'+ fg.rs + bg.rs,
-    None: bg.da_white + ' ' + bg.rs,
-    'o': bg.green + 'o' + bg.rs,
-    'x': bg.red + 'x' + bg.rs,
-  }
+    None: ' ',
+    'o': fg.green + 'o' + fg.rs,
+    'x': fg.red + 'x' + fg.rs,
+  }, lambda x, s: bg(int(x * 255.0), 0, 0) + s + bg.rs
   default_style = sty_style
 except ImportError:
   pass
 
 
-def format_move(game, pos, style=None):
+def format_move(game, pos, style=None, risk_matrix=None):
   if style is None:
     style = default_style
   view = game.view()
-  result = [[style[v] for v in row] for row in view]
+  result = [[style[0][v] for v in row] for row in view]
   if pos is not None:
     i, j = pos
-    result[i][j] = style['x'] if pos in game.mines else style['o']
+    result[i][j] = style[0]['x'] if pos in game.mines else style[0]['o']
+  if risk_matrix is not None:
+    for i, row in enumerate(view):
+      for j, v in enumerate(row):
+        if v is None:
+            r = risk_matrix[i][j]
+            result[i][j] = style[1](r, result[i][j])
   return '\n'.join(''.join(row) for row in result)
 
 

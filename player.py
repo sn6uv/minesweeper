@@ -35,9 +35,8 @@ class Player:
       pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
       hit = game.guess(pos)
       if debug:
-        print('-' * game.width)
-        print(format_move(game, pos))
-        print("p_min =", np.min(pred))
+        print(format_move(game, pos, risk_matrix=pred.reshape(self.height, self.width)))
+        print("p in [%f, %f]" % (np.min(pred), np.max(pred[pred<1])))
       assert(hit is not None)
       self.data.append((game.view(), game.mines))
       if game.is_won():
