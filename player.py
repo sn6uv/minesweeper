@@ -1,4 +1,5 @@
 import pickle
+import random
 
 import numpy as np
 import tensorflow as tf
@@ -29,14 +30,19 @@ class Player:
 
   def play_game(self, game, debug=False):
     hit = False
+    first = True
     while not hit:
       game_input = self.get_model_input(game.view())
       pred = self.predict_mines(game_input)
       pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
-      hit = game.guess(pos)
+      if first:
+        # Randomise first guess to prevent bias, since first mine moves.
+        pos = random.randint(0, self.height-1), random.randint(0, self.width-1)
+        first = False
       if debug:
         print(format_move(game, pos, risk_matrix=pred.reshape(self.height, self.width)))
         print("p in [%f, %f]" % (np.min(pred), np.max(pred[pred<1])))
+      hit = game.guess(pos)
       assert(hit is not None)
       self.data.append((game.view(), game.mines))
       if game.is_won():
