@@ -31,9 +31,9 @@ try:
     7: bg.white + fg.magenta + '7'+ fg.rs + bg.rs,
     8: bg.white + fg.black + '8'+ fg.rs + bg.rs,
     None: ' ',
-    'o': fg.green + 'o' + fg.rs,
-    'x': fg.red + 'x' + fg.rs,
-  }, lambda x, s: bg(int(x * 255.0), 0, 0) + s + bg.rs
+    'o': fg.black + 'o' + fg.rs,
+    'x': fg.black + 'x' + fg.rs,
+  }, lambda x, s: bg(int(x * 255.0), (255 - (int(x * 255.0))), 0) + s + bg.rs
   default_style = sty_style
 except ImportError:
   pass
