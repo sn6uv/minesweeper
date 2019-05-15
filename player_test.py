@@ -6,12 +6,12 @@ from game import Game
 
 
 def test_player():
-  random.seed(a=0)
-  p = Player(3, 3, 1)
-  p.play(10, debug=True)
-  assert(p.data)
-  p.train()
+    random.seed(a=0)
+    p = Player(3, 3, 1)
+    p.play(10, debug=True)
+    assert(p.data)
+    p.train()
 
 
 if __name__ == '__main__':
-  test_player()
+    test_player()
