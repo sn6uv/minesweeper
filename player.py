@@ -29,23 +29,9 @@ class Player:
             print("Win rate: %f%%" % (100.0 * won / float(rounds)))
 
     def play_game(self, game, debug=False):
-        hit = False
-        first = True
-        while not hit:
-            game_input = self.get_model_input(game.view())
-            pred = self.predict_mines(game_input)
-            pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
-            if first:
-                # Randomise first guess to prevent bias, since first mine moves.
-                pos = random.randint(
-                    0, self.height-1), random.randint(0, self.width-1)
-                first = False
-            if debug:
-                print(format_move(game, pos, risk_matrix=pred.reshape(
-                    self.height, self.width)))
-                print("p in [%f, %f]" % (np.min(pred), np.max(pred[pred < 1])))
-            hit = game.guess(pos)
-            assert(hit is not None)
+        hit_mine = False
+        while not hit_mine:
+            hit_mine = self.play_move(game, debug)
             self.data.append((game.view(), game.mines))
             if game.is_won():
                 if debug:
@@ -55,12 +41,26 @@ class Player:
             print("Lost!")
         return False
 
-    def predict_mines(self, game_input):
-        # pred = np.random.random(self.height * self.width)
+    def play_move(self, game, debug):
+        view = game.view()
+        pred = self.predict_mines(view)
+        pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
+        if not game.guessed:
+            # Randomise first guess to prevent bias, since first mine moves.
+            pos = random.randint(
+                0, self.height-1), random.randint(0, self.width-1)
+        if debug:
+            print(format_move(game, pos, risk_matrix=pred.reshape(
+                self.height, self.width)))
+            print("p in [%f, %f]" % (np.min(pred), np.max(pred[pred < 1])))
+        hit = game.guess(pos)
+        assert(hit is not None)
+        return hit
+
+    def predict_mines(self, view):
+        game_input = self.get_model_input(view)
         pred = self.model.predict(game_input)[0]
-        # Set already guessed positions to 1 to avoid choosing them
-        pred[game_input.reshape(self.height, self.width, 10)[
-            :, :, 9].flatten() != 1] = 1
+        pred[view.flatten()!=9]=1    # ignore alreday guessed locations
         return pred
 
     def train(self, *args, **kwargs):
@@ -76,15 +76,7 @@ class Player:
         self.data.extend(pickle.load(f))
 
     def get_model_input(self, view):
-        o = np.zeros((self.height, self.width, 10))
-        for i in range(self.height):
-            for j in range(self.width):
-                pos = (i, j)
-                if view[i][j] is None:
-                    o[i, j, 9] = 1
-                else:
-                    o[i, j, view[i][j]] = 1
-        return o.flatten()
+        return np.eye(10, dtype=np.int8)[view].flatten()
 
     def get_model_output(self, mines):
         o = np.zeros((self.height, self.width))

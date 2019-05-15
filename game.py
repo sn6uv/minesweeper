@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 
 basic_style = {
@@ -11,7 +12,7 @@ basic_style = {
     6: '6',
     7: '7',
     8: '8',
-    None: ' ',
+    9: ' ',
     'o': 'o',
     'x': 'x',
 }, lambda x, s:  s
@@ -30,7 +31,7 @@ try:
         6: bg.white + fg.da_green + '6' + fg.rs + bg.rs,
         7: bg.white + fg.magenta + '7' + fg.rs + bg.rs,
         8: bg.white + fg.black + '8' + fg.rs + bg.rs,
-        None: ' ',
+        9: ' ',
         'o': fg.black + 'o' + fg.rs,
         'x': fg.black + 'x' + fg.rs,
     }, lambda x, s: bg(int(x * 255.0), (255 - (int(x * 255.0))), 0) + s + bg.rs
@@ -50,7 +51,7 @@ def format_move(game, pos, style=None, risk_matrix=None):
     if risk_matrix is not None:
         for i, row in enumerate(view):
             for j, v in enumerate(row):
-                if v is None:
+                if v == 9:
                     r = risk_matrix[i][j]
                     result[i][j] = style[1](r, result[i][j])
     return '\n'.join(''.join(row) for row in result)
@@ -121,13 +122,7 @@ class Game:
 
     def view(self):
         '''machine readable representation of what's seen'''
-        rows = []
-        for i in range(self.height):
-            row = []
-            for j in range(self.width):
-                if (i, j) in self.guessed:
-                    row.append(self.count_nearby_mines((i, j)))
-                else:
-                    row.append(None)
-            rows.append(row)
-        return rows
+        result = np.zeros((self.height, self.width), dtype=np.int8) + 9
+        for (i, j) in self.guessed:
+            result[i, j] = self.count_nearby_mines((i, j))
+        return result

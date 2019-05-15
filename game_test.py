@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from game import Game, format_move, basic_style
 
@@ -64,7 +65,7 @@ def test_view():
     random.seed(a=1)
     g = Game(2, 2, 1)
     g.guess((0, 0))
-    assert(g.view() == [[1, None], [None, None]])
+    assert(np.all(g.view() == np.array([[1, 9], [9, 9]])))
 
 
 def test_format_move():
