@@ -33,7 +33,7 @@ class Model:
         b4 = tf.get_variable('b4', [n])
         z4 = tf.matmul(a3, W4) + b4
 
-        self.p = tf.nn.softmax(z4)
+        self.p = tf.nn.sigmoid(z4)
         self.p_ = tf.placeholder(tf.float32, [None, n])
 
         loss_p = tf.reduce_mean(-tf.reduce_sum(self.p_ * tf.log(self.p) +
