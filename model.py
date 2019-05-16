@@ -10,7 +10,7 @@ class Model:
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
 
-    def build_model(self, beta=0.01):
+    def build_model(self, learning_rate=0.001, beta=0.01):
         n = self.height * self.width
         self.x = tf.placeholder(tf.float32, [None, 10 * n])
 
@@ -36,29 +36,30 @@ class Model:
         self.p = tf.nn.sigmoid(z4)
         self.p_ = tf.placeholder(tf.float32, [None, n])
 
-        loss_p = tf.reduce_mean(-tf.reduce_sum(self.p_ * tf.log(self.p) +
-                                               (1-self.p_) * tf.log(1-self.p), reduction_indices=[1]))
-        # loss_p = tf.reduce_mean(tf.square(self.p - self.p_))
-        regulariser = tf.nn.l2_loss(
-            W1) + tf.nn.l2_loss(W2) + tf.nn.l2_loss(W3) + tf.nn.l2_loss(W4)
+        loss_p = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.p_, logits=z4), reduction_indices=[1]))
+        regulariser = tf.nn.l2_loss(W1) + tf.nn.l2_loss(W2) + tf.nn.l2_loss(W3) + tf.nn.l2_loss(W4)
 
         self.loss = loss_p + beta * regulariser
-        self.train_step = tf.train.AdamOptimizer(0.001).minimize(self.loss)
+        self.train_step = tf.train.AdamOptimizer(learning_rate).minimize(self.loss)
 
-    def train(self, examples, batch_size=5000, factor=1):
+    def train(self, examples, batch_size=5000, epochs=1):
         """Trains the model on examples.
 
         Args:
             examples: list of examples, each example is of the form (grid, p).
         """
-        for idx in range(0, len(examples) * factor, batch_size):
+        losses = []
+        for idx in range(0, len(examples) * epochs, batch_size):
             sample_ids = np.random.randint(len(examples), size=batch_size)
             grids, ps = list(zip(*[examples[i] for i in sample_ids]))
 
             feed_dict = {self.x: grids, self.p_: ps}
             self.sess.run(self.train_step, feed_dict=feed_dict)
             loss = self.sess.run([self.loss], feed_dict=feed_dict)
-            print("loss at iteration %s is %s" % (idx, loss))
+            losses.append(loss[0])
+            if idx % 5000 < batch_size:
+                print("loss at iteration %s is %s" % (idx, sum(losses) / len(losses)))
+                losses = []
 
     def predict(self, grid):
         """Evaluates the model to predict an output.

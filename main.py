@@ -24,8 +24,8 @@ def load_data_and_train(p):
         print("loading ", fname)
         with open(fname, "rb") as f:
             p.load_data(f)
-        p.train()
-        p.data = []
+    p.train(batch_size=64)
+    p.data = []
 
 
 p = Player(9, 9, 10)
@@ -36,6 +36,6 @@ load_data_and_train(p)
 print("Playing...")
 for _ in range(100):
     p.play(5000)
-    p.train(factor=2)
+    p.train(epochs=1, batch_size=64)
     p.play(1, debug=True)
     dump_data(p)
