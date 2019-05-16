@@ -46,8 +46,13 @@ def format_move(game, pos, style=None, risk_matrix=None):
     view = game.view()
     result = [[style[0][v] for v in row] for row in view]
     if pos is not None:
-        i, j = pos
-        result[i][j] = style[0]['x'] if pos in game.mines else style[0]['o']
+        if pos in game.mines:
+            for (i, j) in game.mines:
+                result[i][j] = style[0]['x']
+            result[pos[0]][pos[1]] = style[0]['o']
+        else:
+          i, j = pos
+          result[i][j] = style[0]['o']
     if risk_matrix is not None:
         for i, row in enumerate(view):
             for j, v in enumerate(row):
