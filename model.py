@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import tensorflow as tf
 
@@ -91,17 +92,20 @@ class Model:
         Args:
             examples: list of examples, each example is of the form (grid, p).
         """
-        results = []
-        for idx in range(0, len(examples) * epochs, batch_size):
-            sample_ids = np.random.randint(len(examples), size=batch_size)
-            grids, ps = list(zip(*[examples[i] for i in sample_ids]))
+        for epoch in range(epochs):
+            print("Epoch %3i" % epoch)
+            random.shuffle(examples)
+            results = []
+            for idx in range(0, len(examples)-batch_size, batch_size):
+                batch = examples[idx:idx+batch_size]
+                grids, ps = list(zip(*batch))
 
-            result = self.train_batch(idx, grids, ps)
-            results.append(result)
+                result = self.train_batch(idx, grids, ps)
+                results.append(result)
 
-            if idx % 5000 < batch_size:
-                ModelBatchResults.combine(results).print()
-                results = []
+                if idx % 5000 < batch_size:
+                    ModelBatchResults.combine(results).print()
+                    results = []
 
     def train_batch(self, iteration, grids, ps):
         feed_dict = {self.x: grids, self.p_: ps}
