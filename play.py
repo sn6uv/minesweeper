@@ -16,7 +16,7 @@ def dump_data(p):
 
 if __name__ == '__main__':
     p = Player(9, 9, 10)
-    model_path = "models/9_9_1/model.ckpt"
+    model_path = "models/9_9_10/model.ckpt"
 
     if ask("Load saved model"):
         p.model.restore(model_path)
