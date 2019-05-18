@@ -103,7 +103,7 @@ class Model:
                 result = self.train_batch(idx, grids, ps)
                 results.append(result)
 
-                if idx % 5000 < batch_size:
+                if idx % 50000 < batch_size:
                     ModelBatchResults.combine(results).print()
                     results = []
 
