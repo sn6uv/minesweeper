@@ -15,20 +15,32 @@ only win 0.995^100 = 60.6% of games.
 
 ## Implementation
 
-### player.py
+### Libraries
+
+#### player.py
 
 Uses a neural net (NN) to predict where mines are going to be. The AI player
 chooses the lowest probability location for its next guess.
 
-### model.py
+#### model.py
 
 The NN consists of 4 fully connected layers whose sizes are dynamic depending
 on the game dimensions. A logistic loss function is used.
 
-### game.py
+#### game.py
 
 This variant of minesweeper can be any size. The first guess is guarenteed to
 be safe by moving a mine if the first guess is unlucky.
+
+### Binaries
+
+#### play.py
+
+Plays trial games to generate training data.
+
+#### train.py
+
+Trains on all saved training data.
 
 ## Results
 
@@ -42,4 +54,4 @@ Wins >60% of games (2 mins of training).
 
 ### 9x9 with 10 mines (Beginner)
 
-Wins 1.5% of games (after 20mins training).
+Wins 22% of games (after 10h training on CPU).
