@@ -1,8 +1,51 @@
 import numpy as np
 import tensorflow as tf
 
+class ModelBatchResults:
+    '''
+    The result of training the model on one batch.
+    '''
+    def __init__(self, iteration, loss, precision, recall, accuracy):
+        self.iteration = iteration
+        self.loss = loss
+        self.precision = precision
+        self.recall = recall
+        self.accuracy = accuracy
+
+    @staticmethod
+    def from_prediction(iteration, loss, prediction, actual_mines):
+        actual_mines = np.array(actual_mines)
+        result = ModelBatchResults(None, None, None, None, None)
+        result.iteration = iteration
+        result.loss = loss
+        predicted_mines = prediction > 0.5
+        true_pos = np.sum(np.logical_and((predicted_mines == actual_mines), (predicted_mines == 1)))
+        result.precision = true_pos / np.sum(predicted_mines == 1)
+        result.recall = true_pos / np.sum(actual_mines == 1)
+        result.accuracy = np.sum(predicted_mines == actual_mines) / prediction.size
+        return result
+
+    def print(self):
+        print("Iteration %7i loss: %6.3f precision: %5.3f recall: %5.3f accuracy: %5.3f"
+          % (self.iteration, self.loss, self.precision, self.recall, self.accuracy))
+
+    @staticmethod
+    def combine(results):
+        n = len(results)
+        result = ModelBatchResults(None, None, None, None, None)
+        result.iteration = max(r.iteration for r in results)
+        result.loss = sum(r.loss for r in results) / n
+        result.precision = sum(r.precision for r in results) / n
+        result.recall = sum(r.recall for r in results) / n
+        result.accuracy = sum(r.accuracy for r in results) / n
+        return result
+
 
 class Model:
+    '''
+    A model for predicting the location of mines in a minesweeper game.
+    '''
+
     def __init__(self, height, width):
         self.height = height
         self.width = width
@@ -10,7 +53,7 @@ class Model:
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
 
-    def build_model(self, learning_rate=0.001, beta=0.01):
+    def build_model(self, learning_rate=0.0001, beta=0.01):
         n = self.height * self.width
         self.x = tf.placeholder(tf.float32, [None, 10 * n])
 
@@ -48,18 +91,24 @@ class Model:
         Args:
             examples: list of examples, each example is of the form (grid, p).
         """
-        losses = []
+        results = []
         for idx in range(0, len(examples) * epochs, batch_size):
             sample_ids = np.random.randint(len(examples), size=batch_size)
             grids, ps = list(zip(*[examples[i] for i in sample_ids]))
 
-            feed_dict = {self.x: grids, self.p_: ps}
-            self.sess.run(self.train_step, feed_dict=feed_dict)
-            loss = self.sess.run([self.loss], feed_dict=feed_dict)
-            losses.append(loss[0])
+            result = self.train_batch(idx, grids, ps)
+            results.append(result)
+
             if idx % 5000 < batch_size:
-                print("loss at iteration %s is %s" % (idx, sum(losses) / len(losses)))
-                losses = []
+                ModelBatchResults.combine(results).print()
+                results = []
+
+    def train_batch(self, iteration, grids, ps):
+        feed_dict = {self.x: grids, self.p_: ps}
+        self.sess.run(self.train_step, feed_dict=feed_dict)
+        loss = self.sess.run([self.loss], feed_dict=feed_dict)[0]
+        pred = self.sess.run([self.p], feed_dict=feed_dict)[0]
+        return ModelBatchResults.from_prediction(iteration, loss, pred, ps)
 
     def predict(self, grid):
         """Evaluates the model to predict an output.
