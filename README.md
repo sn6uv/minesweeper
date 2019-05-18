@@ -55,3 +55,5 @@ Wins >60% of games (2 mins of training).
 ### 9x9 with 10 mines (Beginner)
 
 Wins 22% of games (after 10h training on CPU).
+
+![gallery](https://raw.githubusercontent.com/sn6uv/minesweeper/master/results/gallery.png)
