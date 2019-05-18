@@ -11,7 +11,7 @@ def load_data_and_train(p):
         print("loading ", fname)
         with open(fname, "rb") as f:
             p.load_data(f)
-    p.train(batch_size=64)
+    p.train(batch_size=64, epochs=100)
     p.data = []
 
 
