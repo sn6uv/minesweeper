@@ -122,3 +122,13 @@ class Model:
         grid = grid[np.newaxis, :]
         p = self.sess.run([self.p], feed_dict={self.x: grid})
         return p[0]
+
+    def save(self, path):
+        saver = tf.train.Saver()
+        save_path = saver.save(self.sess, path)
+        print("Model saved to %s" % save_path)
+
+    def restore(self, path):
+        saver = tf.train.Saver()
+        saver.restore(self.sess, path)
+        print("Model restored")

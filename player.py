@@ -1,3 +1,4 @@
+import os
 import pickle
 import random
 
@@ -83,3 +84,6 @@ class Player:
         for m in mines:
             o[m] = 1
         return o.flatten()
+
+    def get_data_subdir(self):
+        return os.path.join('data', str(self.height) + '_' + str(self.width) + '_' + str(self.mines))
