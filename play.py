@@ -1,5 +1,6 @@
 import os
 import datetime
+from config import HEIGHT, WIDTH, MINES, MODEL_PATH, PLAY_BATCH_SIZE, PLAY_ROUNDS
 from player import Player
 from utils import ask
 
@@ -15,17 +16,16 @@ def dump_data(p):
 
 
 if __name__ == '__main__':
-    p = Player(9, 9, 10)
-    model_path = "models/9_9_10/model.ckpt"
+    p = Player(HEIGHT, WIDTH, MINES)
 
     if ask("Load saved model"):
-        p.model.restore(model_path)
+        p.model.restore(MODEL_PATH)
 
     print("Playing...")
     try:
-        for i in range(100):
+        for i in range(PLAY_ROUNDS):
             print("Round %3i" % i)
-            p.play(5000)
+            p.play(PLAY_BATCH_SIZE)
             p.play(1, debug=True)
             dump_data(p)
     except KeyboardInterrupt:

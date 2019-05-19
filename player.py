@@ -11,15 +11,12 @@ from model import Model
 class Player:
     '''Plays minesweeper'''
 
-    def __init__(self, height, width, mines, model=None):
+    def __init__(self, height, width, mines):
         self.height = height
         self.width = width
         self.mines = mines
         self.data = []
-        if model is None:
-            self.model = Model(height, width)
-        else:
-            self.model = model
+        self.model = Model(height, width)
 
     def play(self, rounds, debug=False):
         won = 0

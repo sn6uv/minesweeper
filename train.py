@@ -1,5 +1,6 @@
 import glob
 import os
+from config import HEIGHT, WIDTH, MINES, MODEL_PATH, BATCH_SIZE, EPOCHS
 from player import Player
 from utils import ask
 
@@ -11,16 +12,15 @@ def load_data_and_train(p):
         print("loading ", fname)
         with open(fname, "rb") as f:
             p.load_data(f)
-    p.train(batch_size=64, epochs=100)
+    p.train(batch_size=BATCH_SIZE, epochs=EPOCHS)
     p.data = []
 
 
 if __name__ == '__main__':
-    p = Player(9, 9, 10)
-    model_path = "models/9_9_10/model.ckpt"
+    p = Player(HEIGHT, WIDTH, MINES)
 
     if ask("Load saved model"):
-        p.model.restore(model_path)
+        p.model.restore(MODEL_PATH)
 
     print("Training...")
     try:

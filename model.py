@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import tensorflow as tf
+from config import LEARNING_RATE
 
 class ModelBatchResults:
     '''
@@ -54,7 +55,7 @@ class Model:
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
 
-    def build_model(self, learning_rate=0.0001, beta=0.01):
+    def build_model(self, learning_rate=LEARNING_RATE, beta=0.01):
         n = self.height * self.width
         self.x = tf.placeholder(tf.float32, [None, 10 * n])
 
