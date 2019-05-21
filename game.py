@@ -40,14 +40,13 @@ except ImportError:
     pass
 
 
-def format_move(game, pos, style=None, risk_matrix=None):
+def format_move(view, mines, pos, style=None, risk_matrix=None):
     if style is None:
         style = default_style
-    view = game.view()
     result = [[style[0][v] for v in row] for row in view]
     if pos is not None:
-        if pos in game.mines:
-            for (i, j) in game.mines:
+        if pos in mines:
+            for (i, j) in mines:
                 result[i][j] = style[0]['x']
             result[pos[0]][pos[1]] = style[0]['o']
         else:
@@ -83,7 +82,7 @@ class Game:
                 break
 
     def __repr__(self):
-        return format_move(self, None)
+        return format_move(self.view(), self.mines, None)
 
     # Returns True if a mine was hit.
     def guess(self, pos):

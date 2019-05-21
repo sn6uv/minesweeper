@@ -48,7 +48,7 @@ class Player:
             pos = random.randint(
                 0, self.height-1), random.randint(0, self.width-1)
         if debug:
-            print(format_move(game, pos, risk_matrix=pred.reshape(
+            print(format_move(game.view(), game.mines, pos, risk_matrix=pred.reshape(
                 self.height, self.width)))
             print("p in [%f, %f]" % (np.min(pred), np.max(pred[pred < 1])))
         hit = game.guess(pos)

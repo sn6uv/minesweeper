@@ -72,11 +72,11 @@ def test_format_move():
     random.seed(a=1)
     g = Game(2, 2, 1)
     g.guess((0, 0))
-    assert(format_move(g, (0, 0), basic_style) == 'o \n  ')
+    assert(format_move(g.view(), g.mines, (0, 0), basic_style) == 'o \n  ')
     g.guess((1, 1))
-    assert(format_move(g, (1, 1), basic_style) == '1 \n o')
+    assert(format_move(g.view(), g.mines, (1, 1), basic_style) == '1 \n o')
     g.guess((1, 0))
-    assert(format_move(g, (1, 0), basic_style) == '1 \nx1')
+    assert(format_move(g.view(), g.mines, (1, 0), basic_style) == '1 \nx1')
 
 
 if __name__ == '__main__':
