@@ -15,13 +15,7 @@ def load_loosing_games(p):
         with open(fname, "rb") as f:
             p.load_data(f)
     print("Found", len(p.data), "examples")
-    data, p.data = p.data, []
-    for i, (grid, ps) in enumerate(data):
-        if i == len(data):
-            continue
-        if np.sum(grid == 9) == p.mines + 5:
-            pred = p.predict_mines(grid).reshape(HEIGHT, WIDTH)
-            p.data.append((grid, ps))
+    p.data = [(grid, ps) for (grid, ps) in p.data if np.sum(grid == 9) < p.mines+5]
     print("Found", len(p.data), "losing examples")
 
 

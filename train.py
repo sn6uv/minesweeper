@@ -29,4 +29,4 @@ if __name__ == '__main__':
         print("Training interrupted!")
 
     if ask("Would you like to save model"):
-        p.model.save(model_path)
+        p.model.save(MODEL_PATH)
