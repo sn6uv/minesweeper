@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import tensorflow as tf
-from config import LEARNING_RATE
+from config import LEARNING_RATE, L2_REGULARISATION, PRINT_ITERATIONS
 
 class ModelBatchResults:
     '''
@@ -52,7 +52,7 @@ class Model:
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
 
-    def build_model(self, learning_rate=LEARNING_RATE, beta=0.01):
+    def build_model(self, learning_rate=LEARNING_RATE, beta=L2_REGULARISATION):
         n = self.height * self.width
         self.x = tf.placeholder(tf.float32, [None, 10 * n])
 
@@ -101,7 +101,7 @@ class Model:
                 result = self.train_batch(idx, grids, ps)
                 results.append(result)
 
-                if idx % 50000 < batch_size:
+                if idx % PRINT_ITERATIONS < batch_size:
                     ModelBatchResults.combine(results).print(idx+batch_size, len(examples))
                     results = []
             if results:
