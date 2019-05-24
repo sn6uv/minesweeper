@@ -1,3 +1,9 @@
+import glob
+import os
+import random
+from config import HEIGHT, WIDTH, MINES
+
+
 def ask(question):
     while True:
         i = input(question + " [y/n] ")
@@ -5,3 +11,14 @@ def ask(question):
             return True
         if i and i in 'nN':
             return False
+
+
+def get_data_dir():
+    return os.path.join('data', str(HEIGHT) + '_' + str(WIDTH) + '_' + str(MINES))
+
+
+def get_data_files():
+    subdir = get_data_dir()
+    fnames = glob.glob(os.path.join(subdir, "*.pickle"))
+    random.shuffle(fnames)
+    return fnames

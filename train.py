@@ -2,13 +2,12 @@ import glob
 import os
 from config import HEIGHT, WIDTH, MINES, MODEL_PATH, BATCH_SIZE, EPOCHS
 from player import Player
-from utils import ask
+from utils import ask, get_data_files
 
 
 def load_data_and_train(p):
     p.data = []
-    subdir = p.get_data_subdir()
-    for fname in glob.glob(os.path.join(subdir, "*.pickle")):
+    for fname in get_data_files():
         print("loading ", fname)
         with open(fname, "rb") as f:
             p.load_data(f)
