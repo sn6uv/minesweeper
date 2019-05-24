@@ -42,14 +42,15 @@ if __name__ == '__main__':
     load_loosing_games(p)
 
     try:
-        p.train(batch_size=BATCH_SIZE, epochs=EPOCHS)
+        while True:
+            p.play(1, debug=True)
+            print("Playing...")
+            p.play(PLAY_BATCH_SIZE)
+            print("Training...")
+            p.train(batch_size=BATCH_SIZE, epochs=EPOCHS)
+            print()
     except KeyboardInterrupt:
         print("Training interrupted!")
-
-    p.play(PLAY_BATCH_SIZE)
-    for _ in range(5):
-        p.play(1, debug=True)
-        print()
 
     if ask("Would you like to save model"):
         p.model.save(MODEL_PATH)
