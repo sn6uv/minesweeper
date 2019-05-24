@@ -8,9 +8,12 @@ from game import Game
 def test_player():
     random.seed(a=0)
     p = Player(3, 3, 1)
-    p.play(10, debug=True)
+    p.play(1, debug=True)
     assert(p.data)
-    p.train()
+    p.play(1000)
+    p.train(epochs=5, batch_size=16)
+    p.play(1000)
+    p.play(1, debug=True)
 
 
 if __name__ == '__main__':
