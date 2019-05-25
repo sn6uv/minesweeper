@@ -25,9 +25,13 @@ class ModelBatchResults:
         result.accuracy = np.sum(predicted_mines == actual_mines) / prediction.size
         return result
 
-    def print(self, iteration, total_iterations):
+    def print_training(self, iteration, total_iterations):
         print("%5.1f%% iteration: %7i loss: %6.3f precision: %5.3f recall: %5.3f accuracy: %5.3f"
           % (100.0 * iteration / total_iterations, iteration, self.loss, self.precision, self.recall, self.accuracy))
+
+    def print_testing(self):
+        print("Testing:                  loss: %6.3f precision: %5.3f recall: %5.3f accuracy: %5.3f"
+          % (self.loss, self.precision, self.recall, self.accuracy))
 
     @staticmethod
     def combine(results):
@@ -90,6 +94,14 @@ class Model:
         Args:
             examples: list of examples, each example is of the form (grid, p).
         """
+
+        # Split a fraction of data for testing. Since data comes from playing
+        # games, if we take a random subset for testing then it's correlated
+        # with the training data. Taking a slice off the end mitigates this.
+        num_test_examples = int(len(examples) * 0.01)
+        examples, test_examples = examples[:-num_test_examples], examples[-num_test_examples:]
+        test_data = list(zip(*test_examples))
+
         for epoch in range(epochs):
             print("Epoch %3i" % epoch)
             random.shuffle(examples)
@@ -98,19 +110,26 @@ class Model:
                 batch = examples[idx:idx+batch_size]
                 grids, ps = list(zip(*batch))
 
-                result = self.train_batch(idx, grids, ps)
+                result = self.train_batch(grids, ps)
                 results.append(result)
 
                 if idx % PRINT_ITERATIONS < batch_size:
-                    ModelBatchResults.combine(results).print(idx+batch_size, len(examples))
+                    ModelBatchResults.combine(results).print_training(idx+batch_size, len(examples))
                     results = []
             if results:
-                ModelBatchResults.combine(results).print(len(examples), len(examples))
+                ModelBatchResults.combine(results).print_training(len(examples), len(examples))
                 results = []
+            self.measure_batch(*test_data).print_testing()
 
-    def train_batch(self, iteration, grids, ps):
+    def train_batch(self, grids, ps):
         feed_dict = {self.x: grids, self.p_: ps}
         self.sess.run(self.train_step, feed_dict=feed_dict)
+        loss = self.sess.run([self.loss], feed_dict=feed_dict)[0]
+        pred = self.sess.run([self.p], feed_dict=feed_dict)[0]
+        return ModelBatchResults.from_prediction(loss, pred, ps)
+
+    def measure_batch(self, grids, ps):
+        feed_dict = {self.x: grids, self.p_: ps}
         loss = self.sess.run([self.loss], feed_dict=feed_dict)[0]
         pred = self.sess.run([self.p], feed_dict=feed_dict)[0]
         return ModelBatchResults.from_prediction(loss, pred, ps)
