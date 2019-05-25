@@ -101,6 +101,7 @@ class Model:
         num_test_examples = int(len(examples) * 0.01)
         examples, test_examples = examples[:-num_test_examples], examples[-num_test_examples:]
         test_data = list(zip(*test_examples))
+        self.measure_batch(*test_data).print_testing()
 
         for epoch in range(epochs):
             print("Epoch %3i" % epoch)

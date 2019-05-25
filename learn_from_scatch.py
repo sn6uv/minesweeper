@@ -11,31 +11,28 @@ def play_train(p, play_games, train_epochs, batch_size):
     p.play(play_games)
     print("Training on %i examples" % len(p.data))
     p.train(batch_size=batch_size, epochs=train_epochs)
-
-
-def train_0_to_1(p):
-    '''Trains to 1.5% win rate'''
-    p.play(1, debug=True)
-    play_train(p, 1000, 3, 64)
-    play_train(p, 5000, 3, 64)
     p.data = []
+
+
+def train_0_to_2(p):
+    '''Trains to 2% win rate'''
+    p.play(1, debug=True)
+    play_train(p, 5000, 3, 64)
+    play_train(p, 5000, 1, 64)
     p.model.save("models/9_9_10_scratch0/model.ckpt")
 
 
-def train_1_to_5(p):
-    '''Trains from 1.5% to 5% win rate'''
+def train_2_to_5(p):
+    '''Trains from 2% to 5% win rate'''
     p.play(1, debug=True)
-    play_train(p, 10000, 2, 64)
-    p.data = []
+    play_train(p, 10000, 1, 64)
     p.model.save("models/9_9_10_scratch1/model.ckpt")
 
 
 def train_5_to_15(p):
     '''Trains from 5% to 10% win rate'''
     p.play(1, debug=True)
-    play_train(p, 10000, 2, 64)
-    play_train(p, 25000, 2, 256)
-    p.data = []
+    play_train(p, 20000, 2, 256)
     p.model.save("models/9_9_10_scratch2/model.ckpt")
 
 
@@ -43,18 +40,17 @@ def train_15_to_25(p):
     '''Trains from 5% to 10% win rate'''
     p.play(1, debug=True)
     play_train(p, 20000, 1, 256)
-    play_train(p, 25000, 2, 1024)
-    p.data = []
+    play_train(p, 25000, 1, 1024)
     p.model.save("models/9_9_10_scratch3/model.ckpt")
 
 
 def main():
     p = Player(HEIGHT, WIDTH, MINES)
 
-    train_0_to_1(p)
+    train_0_to_2(p)
     # p.model.restore("models/9_9_10_scratch0/model.ckpt")
 
-    train_1_to_5(p)
+    train_2_to_5(p)
     # p.model.restore("models/9_9_10_scratch1/model.ckpt")
 
     train_5_to_15(p)
