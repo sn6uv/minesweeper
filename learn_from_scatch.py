@@ -44,6 +44,14 @@ def train_15_to_25(p):
     p.model.save("models/9_9_10_scratch3/model.ckpt")
 
 
+def train_25_to_35(p):
+    '''Trains from 25% to 35% win rate'''
+    p.play(1, debug=True)
+    play_train(p, 25000, 1, 1024)
+    play_train(p, 25000, 1, 4096)
+    p.model.save("models/9_9_10_scratch4/model.ckpt")
+
+
 def main():
     p = Player(HEIGHT, WIDTH, MINES)
 
@@ -58,6 +66,9 @@ def main():
 
     train_15_to_25(p)
     # p.model.restore("models/9_9_10_scratch3/model.ckpt")
+
+    train_25_to_35(p)
+    # p.model.restore("models/9_9_10_scratch4/model.ckpt")
 
     p.play(1, debug=True)
     p.play(1000)
