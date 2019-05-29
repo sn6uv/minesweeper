@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from functools import lru_cache
 
 
 basic_style = {
@@ -38,6 +39,19 @@ try:
     default_style = sty_style
 except ImportError:
     pass
+
+
+def neighbors_do(pos, height, width):
+    '''Find the neighbors of a given position in a grid.'''
+    i, j = pos
+    for ii in range(max(i-1, 0), min(i+2, height)):
+        for jj in range(max(j-1, 0), min(j+2, width)):
+            yield (ii, jj)
+
+
+@lru_cache(maxsize=81)
+def neighbors(pos, height, width):
+    return list(neighbors_do(pos, height, width))
 
 
 def format_move(view, mines, pos, style=None, risk_matrix=None):
@@ -98,15 +112,10 @@ class Game:
         self.spread(pos)
         return False
 
-    def neighbors(self, pos):
-        i, j = pos
-        for ii in range(max(i-1, 0), min(i+2, self.height)):
-            for jj in range(max(j-1, 0), min(j+2, self.width)):
-                yield (ii, jj)
 
     def count_nearby_mines(self, pos):
         result = 0
-        for n in self.neighbors(pos):
+        for n in neighbors(pos, self.height, self.width):
             if n in self.mines:
                 result += 1
         return result
@@ -118,7 +127,7 @@ class Game:
         self.guessed.add(pos)
         if self.count_nearby_mines(pos) > 0:
             return
-        for n in self.neighbors(pos):
+        for n in neighbors(pos, self.height, self.width):
             self.spread(n)
 
     def is_won(self):
