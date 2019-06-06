@@ -1,7 +1,7 @@
 import glob
 import os
 import random
-from config import HEIGHT, WIDTH, MINES
+from config import HEIGHT, WIDTH, MINES, MODEL_DIR
 
 
 def ask(question):
@@ -22,3 +22,7 @@ def get_data_files():
     fnames = glob.glob(os.path.join(subdir, "*.pickle"))
     random.shuffle(fnames)
     return fnames
+
+
+def model_path(name):
+    return os.path.join(MODEL_DIR, "%i_%i_%i/%s.ckpt" % (HEIGHT, WIDTH, MINES, name))

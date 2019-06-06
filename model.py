@@ -2,6 +2,7 @@ import random
 import numpy as np
 import tensorflow as tf
 from config import LEARNING_RATE, L2_REGULARISATION, PRINT_ITERATIONS
+from utils import model_path
 
 class ModelBatchResults:
     '''
@@ -148,12 +149,14 @@ class Model:
         p = self.sess.run([self.p], feed_dict={self.x: grid})
         return p[0]
 
-    def save(self, path):
+    def save(self, name):
+        path = model_path(name)
         saver = tf.train.Saver()
         save_path = saver.save(self.sess, path)
         print("Model saved to %s" % save_path)
 
-    def restore(self, path):
+    def restore(self, name):
+        path = model_path(name)
         saver = tf.train.Saver()
         saver.restore(self.sess, path)
         print("Model restored")
