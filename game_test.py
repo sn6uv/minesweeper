@@ -76,7 +76,7 @@ def test_format_move():
     g.guess((1, 1))
     assert(format_move(g.view(), g.mines, (1, 1), basic_style) == '1 \n o')
     g.guess((1, 0))
-    assert(format_move(g.view(), g.mines, (1, 0), basic_style) == '1 \nx1')
+    assert(format_move(g.view(), g.mines, (1, 0), basic_style) == '1 \no1')
 
 
 if __name__ == '__main__':
