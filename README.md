@@ -46,14 +46,14 @@ Trains on all saved training data.
 
 ### 4x4 with 2 mines
 
-Wins >95% of games (<1 min of training).
+Wins >90% of games (<1 min of training).
 
 ### 5x5 with 3 mines
 
-Wins >60% of games (2 mins of training).
+Wins >80% of games (10 mins of training).
 
 ### 9x9 with 10 mines (Beginner)
 
-Wins 54% of games (after several days training on CPU).
+Wins 80% of games (after several hours training on CPU).
 
 ![gallery](https://raw.githubusercontent.com/sn6uv/minesweeper/master/results/gallery.png)
