@@ -1,8 +1,10 @@
 import random
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from config import LEARNING_RATE, L2_REGULARISATION, PRINT_ITERATIONS
 from utils import model_path
+
+tf.disable_v2_behavior()
 
 class ModelBatchResults:
     '''
