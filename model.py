@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from config import LEARNING_RATE, L2_REGULARISATION, PRINT_ITERATIONS
 from utils import model_path
-from tensorflow  import keras
+from tensorflow import keras
 
 
 class Model:
@@ -19,10 +19,11 @@ class Model:
     def build_model(self, learning_rate=LEARNING_RATE, beta=L2_REGULARISATION):
         n = self.height * self.width
         inputs = tf.keras.Input(shape=(10*n,))
-        x = tf.keras.layers.Dense(20 * n, activation='relu')(inputs)
-        x = tf.keras.layers.Dense(10 * n, activation='relu')(x)
-        x = tf.keras.layers.Dense(5 * n, activation='relu')(x)
-        outputs = tf.keras.layers.Dense(n, activation='sigmoid')(x)
+        reg = keras.regularizers.l2(beta)
+        x = tf.keras.layers.Dense(20 * n, activation='relu', kernel_regularizer=reg)(inputs)
+        x = tf.keras.layers.Dense(10 * n, activation='relu', kernel_regularizer=reg)(x)
+        x = tf.keras.layers.Dense(5 * n, activation='relu', kernel_regularizer=reg)(x)
+        outputs = tf.keras.layers.Dense(n, activation='sigmoid', kernel_regularizer=reg)(x)
         self.model = tf.keras.Model(inputs=inputs, outputs=outputs)
         self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
