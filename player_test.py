@@ -7,7 +7,7 @@ from game import Game
 
 def test_player():
     random.seed(a=0)
-    p = Player(3, 3, 1)
+    p = Player(5, 5, 1)
     p.play(1, debug=True)
     assert(p.data)
     p.play(1000)

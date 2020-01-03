@@ -61,35 +61,14 @@ class Model:
 
     def build_model(self, learning_rate=LEARNING_RATE, beta=L2_REGULARISATION):
         n = self.height * self.width
-        self.x = tf.placeholder(tf.float32, [None, 10 * n])
-
-        W1 = tf.get_variable('W1', [10 * n, 20 * n])
-        b1 = tf.get_variable('b1', [20 * n])
-        z1 = tf.matmul(self.x, W1) + b1
-        a1 = tf.nn.relu(z1)
-
-        W2 = tf.get_variable('W2', [20 * n, 10 * n])
-        b2 = tf.get_variable('b2', [10 * n])
-        z2 = tf.matmul(a1, W2) + b2
-        a2 = tf.nn.relu(z2)
-
-        W3 = tf.get_variable('W3', [10 * n, 5 * n])
-        b3 = tf.get_variable('b3', [5 * n])
-        z3 = tf.matmul(a2, W3) + b3
-        a3 = tf.nn.relu(z3)
-
-        W4 = tf.get_variable('W4', [5 * n, n])
-        b4 = tf.get_variable('b4', [n])
-        z4 = tf.matmul(a3, W4) + b4
-
-        self.p = tf.nn.sigmoid(z4)
-        self.p_ = tf.placeholder(tf.float32, [None, n])
-
-        loss_p = tf.reduce_mean(tf.reduce_sum(tf.nn.sigmoid_cross_entropy_with_logits(labels=self.p_, logits=z4), reduction_indices=[1]))
-        regulariser = tf.nn.l2_loss(W1) + tf.nn.l2_loss(W2) + tf.nn.l2_loss(W3) + tf.nn.l2_loss(W4)
-
-        self.loss = loss_p + beta * regulariser
-        self.train_step = tf.train.AdamOptimizer(learning_rate).minimize(self.loss)
+        self.model = keras.models.Sequential()
+        self.model.add(keras.layers.Conv2D(64, kernel_size=3, activation='relu', input_shape=(self.height, self.width, 10)))
+        self.model.add(keras.layers.Conv2D(32, kernel_size=3, activation='relu'))
+        self.model.add(keras.layers.Flatten())
+        reg = keras.regularizers.l2(beta)
+        self.model.add(tf.keras.layers.Dense(5 * n, activation='relu', kernel_regularizer=reg))
+        self.model.add(tf.keras.layers.Dense(n, activation='sigmoid', kernel_regularizer=reg))
+        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     def train(self, examples, batch_size=5000, epochs=1):
         """Trains the model on examples.
@@ -104,39 +83,10 @@ class Model:
         num_test_examples = int(len(examples) * 0.01)
         examples, test_examples = examples[:-num_test_examples], examples[-num_test_examples:]
         test_data = list(zip(*test_examples))
-        self.measure_batch(*test_data).print_testing()
+        train_data = list(zip(*examples))
+        self.model.fit(np.array(train_data[0]), np.array(train_data[1]), batch_size=batch_size, epochs=epochs)
 
-        for epoch in range(epochs):
-            print("Epoch %3i" % epoch)
-            random.shuffle(examples)
-            results = []
-            for idx in range(0, len(examples), batch_size):
-                batch = examples[idx:idx+batch_size]
-                grids, ps = list(zip(*batch))
-
-                result = self.train_batch(grids, ps)
-                results.append(result)
-
-                if idx % PRINT_ITERATIONS < batch_size:
-                    ModelBatchResults.combine(results).print_training(idx+batch_size, len(examples))
-                    results = []
-            if results:
-                ModelBatchResults.combine(results).print_training(len(examples), len(examples))
-                results = []
-            self.measure_batch(*test_data).print_testing()
-
-    def train_batch(self, grids, ps):
-        feed_dict = {self.x: grids, self.p_: ps}
-        self.sess.run(self.train_step, feed_dict=feed_dict)
-        loss = self.sess.run([self.loss], feed_dict=feed_dict)[0]
-        pred = self.sess.run([self.p], feed_dict=feed_dict)[0]
-        return ModelBatchResults.from_prediction(loss, pred, ps)
-
-    def measure_batch(self, grids, ps):
-        feed_dict = {self.x: grids, self.p_: ps}
-        loss = self.sess.run([self.loss], feed_dict=feed_dict)[0]
-        pred = self.sess.run([self.p], feed_dict=feed_dict)[0]
-        return ModelBatchResults.from_prediction(loss, pred, ps)
+        _, acc = self.model.evaluate(np.array(test_data[0]), np.array(test_data[1]))
 
     def predict(self, grid):
         """Evaluates the model to predict an output.

@@ -56,8 +56,7 @@ class Player:
         return hit
 
     def predict_mines(self, view):
-        game_input = self.get_model_input(view)
-        pred = self.model.predict(game_input)[0]
+        pred = self.model.predict(self.get_model_input(view))[0]
         pred[view.flatten()!=9]=1    # ignore alreday guessed locations
         return pred
 
@@ -74,7 +73,7 @@ class Player:
         self.data.extend(pickle.load(f))
 
     def get_model_input(self, view):
-        return np.eye(10, dtype=np.int8)[view].flatten()
+        return tf.keras.utils.to_categorical(view)
 
     def get_model_output(self, mines):
         o = np.zeros((self.height, self.width))
