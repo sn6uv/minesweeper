@@ -1,6 +1,7 @@
 import os
 import pickle
 import random
+import datetime
 
 import numpy as np
 import tensorflow as tf
@@ -26,7 +27,7 @@ class Player:
             g = Game(self.height, self.width, self.mines)
             won += self.play_game(g, debug)
         if rounds > 1:
-            print("Win rate: %f%%" % (100.0 * won / float(rounds)))
+            print(datetime.datetime.now(), "Win rate: %f%%" % (100.0 * won / float(rounds)))
 
     def play_game(self, game, debug=False):
         hit_mine = False
