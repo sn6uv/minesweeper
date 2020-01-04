@@ -26,3 +26,14 @@ def get_data_files():
 
 def model_path(name):
     return os.path.join(MODEL_DIR, "%i_%i_%i/%s.ckpt" % (HEIGHT, WIDTH, MINES, name))
+
+
+def play_train(p, play_games, train_epochs, batch_size, save_data=False):
+    '''Play a number of games and then train on the resulting data'''
+    print("Playing %i games" % play_games)
+    p.play(play_games)
+    print("Training on %i examples" % len(p.data))
+    p.train(batch_size=batch_size, epochs=train_epochs)
+    if save_data:
+        p.dump_data()
+    p.data = []

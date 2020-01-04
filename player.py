@@ -4,6 +4,7 @@ import random
 
 import numpy as np
 import tensorflow as tf
+from config import DATA_DIR
 from game import Game, format_move
 from model import Model
 
@@ -83,4 +84,4 @@ class Player:
         return o.flatten()
 
     def get_data_subdir(self):
-        return os.path.join('data', str(self.height) + '_' + str(self.width) + '_' + str(self.mines))
+        return os.path.join(DATA_DIR, str(self.height) + '_' + str(self.width) + '_' + str(self.mines))

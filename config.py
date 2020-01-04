@@ -11,3 +11,5 @@ EPOCHS = 1
 PRINT_ITERATIONS=10000
 
 MODEL_DIR = "models/"
+
+DATA_DIR = "data/"

@@ -1,17 +1,7 @@
 '''Script for bootstrapping the model by playing games and trainging on them '''
 from config import HEIGHT, WIDTH, MINES
 from player import Player
-
-MODEL_PATH = "models/9_9_10_scratch/model.ckpt"
-
-
-def play_train(p, play_games, train_epochs, batch_size):
-    '''Play a number of games and then train on the resulting data'''
-    print("Playing %i games" % play_games)
-    p.play(play_games)
-    print("Training on %i examples" % len(p.data))
-    p.train(batch_size=batch_size, epochs=train_epochs)
-    p.data = []
+from utils import play_train
 
 
 def train_0_to_2(p):
@@ -59,8 +49,8 @@ def train_35_to_45(p):
     p.model.save("scratch5")
 
 
-def train_45_to_55(p):
-    '''Trains from 45% to 55% win rate'''
+def train_45_to_50(p):
+    '''Trains from 45% to 50% win rate'''
     p.play(1, debug=True)
     play_train(p, 50000, 3, 16384)
     p.model.save("scratch6")
@@ -70,28 +60,30 @@ def main():
     p = Player(HEIGHT, WIDTH, MINES)
 
     train_0_to_2(p)
-    # p.model.restore("models/9_9_10_scratch0/model.ckpt")
+    # p.model.restore("scratch0")
 
     train_2_to_5(p)
-    # p.model.restore("models/9_9_10_scratch1/model.ckpt")
+    # p.model.restore("scratch1")
 
     train_5_to_15(p)
-    # p.model.restore("models/9_9_10_scratch2/model.ckpt")
+    # p.model.restore("scratch2")
 
     train_15_to_25(p)
-    # p.model.restore("models/9_9_10_scratch3/model.ckpt")
+    # p.model.restore("scratch3")
 
     train_25_to_35(p)
-    # p.model.restore("models/9_9_10_scratch4/model.ckpt")
+    # p.model.restore("scratch4")
 
     train_35_to_45(p)
-    # p.model.restore("models/9_9_10_scratch5/model.ckpt")
+    # p.model.restore("scratch5")
 
-    train_45_to_55(p)
-    # p.model.restore("models/9_9_10_scratch6/model.ckpt")
+    train_45_to_50(p)
+    # p.model.restore("scratch6")
 
-    p.play(1, debug=True)
-    p.play(1000)
+    while True:
+        p.play(1, debug=True)
+        play_train(p, 50000, 1, 32768)
+        p.model.save("scratch7")
 
 
 if __name__ == '__main__':
