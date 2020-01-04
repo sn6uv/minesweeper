@@ -7,6 +7,7 @@ import tensorflow as tf
 from config import DATA_DIR
 from game import Game, format_move
 from model import Model
+from symmetry import dihedral
 
 
 class Player:
@@ -63,8 +64,10 @@ class Player:
         return pred
 
     def train(self, *args, **kwargs):
-        i = [(self.get_model_input(row[0]), self.get_model_output(row[1]))
-             for row in self.data]
+        i = []
+        for row in self.data:
+            j = random.randint(0, 8)  # symmetry index
+            i.append((self.get_model_input(row[0], j), self.get_model_output(row[1], j)))
         self.model.train(i, *args, **kwargs)
 
     def dump_data(self, f):
@@ -74,13 +77,15 @@ class Player:
     def load_data(self, f):
         self.data.extend(pickle.load(f))
 
-    def get_model_input(self, view):
-        return np.eye(10, dtype=np.int8)[view].flatten()
+    def get_model_input(self, view, symmetry_index=0):
+        x = dihedral(view, symmetry_index)
+        return np.eye(10, dtype=np.int8)[x].flatten()
 
-    def get_model_output(self, mines):
+    def get_model_output(self, mines, symmetry_index=0):
         o = np.zeros((self.height, self.width))
         for m in mines:
             o[m] = 1
+        o = dihedral(o, symmetry_index)
         return o.flatten()
 
     def get_data_subdir(self):
