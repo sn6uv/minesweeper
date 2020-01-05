@@ -13,3 +13,6 @@ PRINT_ITERATIONS=10000
 MODEL_DIR = "models/"
 
 DATA_DIR = "data/"
+
+# Max number of concurrent games to play
+GAME_BATCH_SIZE = 32

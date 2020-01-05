@@ -5,7 +5,7 @@ import datetime
 
 import numpy as np
 import tensorflow as tf
-from config import DATA_DIR
+from config import DATA_DIR, GAME_BATCH_SIZE
 from game import Game, format_move
 from model import Model
 from symmetry import dihedral
@@ -21,18 +21,38 @@ class Player:
         self.data = []
         self.model = Model(height, width)
 
-    def play(self, rounds, debug=False):
+    def play_debug(self):
+        g = Game(self.height, self.width, self.mines)
+        self.play_game(g, True)
+
+    def play(self, rounds, game_batch_size=GAME_BATCH_SIZE):
         won = 0
-        for _ in range(rounds):
-            g = Game(self.height, self.width, self.mines)
-            won += self.play_game(g, debug)
-        if rounds > 1:
-            print(datetime.datetime.now(), "Win rate: %f%%" % (100.0 * won / float(rounds)))
+        gs = [Game(self.height, self.width, self.mines) for _ in range(game_batch_size)]
+        started_games = game_batch_size
+        while gs:
+            views = np.array([g.view() for g in gs])
+            preds = self.predict_mines(views)
+            for i, g in enumerate(gs):
+                hit_mine = self.play_move(g, preds[i, :], False)
+                self.data.append((g.view(), g.mines))
+                if g.is_won():
+                    won += 1
+                elif not hit_mine:
+                    continue
+
+                if started_games < rounds:
+                    gs[i] = Game(self.height, self.width, self.mines)
+                    started_games += 1
+                else:
+                    gs[i] = None
+            gs = [g for g in gs if g is not None]
+        print(datetime.datetime.now(), "Win rate: %f%%" % (100.0 * won / float(rounds)))
 
     def play_game(self, game, debug=False):
         hit_mine = False
         while not hit_mine:
-            hit_mine = self.play_move(game, debug)
+            pred = self.predict_mines(game.view())
+            hit_mine = self.play_move(game, pred, debug)
             self.data.append((game.view(), game.mines))
             if game.is_won():
                 if debug:
@@ -42,9 +62,8 @@ class Player:
             print("Lost!")
         return False
 
-    def play_move(self, game, debug):
+    def play_move(self, game, pred, debug):
         view = game.view()
-        pred = self.predict_mines(view)
         pos = np.unravel_index(np.argmin(pred), (self.height, self.width))
         if not game.guessed:
             # Randomise first guess to prevent bias, since first mine moves.
@@ -60,8 +79,11 @@ class Player:
 
     def predict_mines(self, view):
         game_input = self.get_model_input(view)
-        pred = self.model.predict(game_input)[0]
-        pred[view.flatten()!=9]=1    # ignore alreday guessed locations
+        pred = self.model.predict(game_input)
+
+        # Ignore alreday guessed locations
+        pred[view.reshape(*view.shape[:-2], -1) != 9] = 1
+
         return pred
 
     def train(self, *args, **kwargs):
@@ -80,7 +102,9 @@ class Player:
 
     def get_model_input(self, view, symmetry_index=0):
         x = dihedral(view, symmetry_index)
-        return np.eye(10, dtype=np.int8)[x].flatten()
+        onehot = np.eye(10, dtype=np.int8)[x]
+        # Flatten final 3 axes (category, x, y)
+        return onehot.reshape(*onehot.shape[:-3], -1)
 
     def get_model_output(self, mines, symmetry_index=0):
         o = np.zeros((self.height, self.width))

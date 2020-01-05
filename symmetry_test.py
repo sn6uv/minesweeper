@@ -24,6 +24,14 @@ def test_d4():
     assert(np.array_equal(dihedral(x, 7), [[1, 3], [2, 4]]))
 
 
+def test_vectorised():
+    x = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+    y = np.array([[[2, 4], [1, 3]], [[6, 8], [5, 7]]])
+    assert(np.array_equal(dihedral(x, 1), y))
+    assert(np.array_equal(dihedral(dihedral(x, 5), 5), x))
+
+
 if __name__ == '__main__':
     test_d2()
     test_d4()
+    test_vectorised()

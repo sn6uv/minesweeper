@@ -142,14 +142,18 @@ class Model:
         """Evaluates the model to predict an output.
 
         Args:
-            grid: a game state as a height*width*10 vector.
+            grid: a game state as a height*width*10 vector or array of states.
 
         Returns:
             p: probability distribution over moves.
         """
-        grid = grid[np.newaxis, :]
-        p = self.sess.run([self.p], feed_dict={self.x: grid})
-        return p[0]
+        single = (len(grid.shape) == 1)
+        if single:
+            grid = grid[np.newaxis, :]
+        p = self.sess.run([self.p], feed_dict={self.x: grid})[0]
+        if single:
+            p = p[0]
+        return p
 
     def save(self, name):
         path = model_path(name)
